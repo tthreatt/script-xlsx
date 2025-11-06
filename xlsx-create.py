@@ -304,7 +304,6 @@ for sheet_name in sheet_data.keys():
     print("-", sheet_name)
 
 log_memory("After combining all data")
-log_memory("Before writing XLSX")
 
 # ============================================================================
 # STEP 2: CREATE EXCEL WORKBOOK WITH ALL SHEETS
@@ -328,6 +327,7 @@ ws = wb['Search_Tab']
 if "Search_Tab" in wb.sheetnames and wb.sheetnames[-1] == "Search_Tab":
     wb.move_sheet("Search_Tab", offset=-len(wb.sheetnames)+1)
 
+log_memory("After creating data frame")
 # ============================================================================
 # STEP 3: ADD FILTER FORMULAS TO SEARCH_TAB
 # ============================================================================
@@ -379,6 +379,8 @@ for block in search_layout:
     
     # Place the formula in the row below the headers
     ws.cell(row=row + 1, column=1, value=formula)
+    
+    log_memory("After creating filters")
 
 # ============================================================================
 # STEP 4: CREATE ISSUER DROPDOWN FOR LICENSE FILTERING
@@ -439,6 +441,8 @@ if license_sheetname and license_sheetname in wb.sheetnames:
         issuer_ws.sheet_state = 'hidden'
 else:
     print("Warning: License sheet not found. Issuer drop-down will be skipped.")
+
+log_memory("After creating dropdown")
 
 # ============================================================================
 # STEP 5: SAVE THE WORKBOOK
