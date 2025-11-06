@@ -60,10 +60,22 @@ from openpyxl.styles import Font
 from openpyxl.worksheet.datavalidation import DataValidation
 from datetime import datetime
 import os
+import tracemalloc
+import psutil
+
+tracemalloc.start()
+
+def log_memory(location):
+    """Helper function to log memory at any point"""
+    current, peak = tracemalloc.get_traced_memory()
+    available = psutil.virtual_memory().available / 1024 / 1024
+    print(f"[{location}] Current: {current / 1024 / 1024:.1f} MB | Peak: {peak / 1024 / 1024:.1f} MB | Available RAM: {available:.1f} MB")
 
 # ============================================================================
 # CONFIGURATION SECTION - Update these paths for your environment
 # ============================================================================
+
+log_memory("Script start")
 
 # Directory containing the input CSV files
 input_dir = '/Users/tthreatt/Desktop/BCBS-SC'
@@ -79,6 +91,13 @@ csv_files = [f for f in os.listdir(input_dir) if f.endswith('.csv')]
 print("*** All files being processed: ***")
 for fname in csv_files:
     print("-", fname)
+
+for csv_file in csv_files:
+    # Add the full path by joining input_dir with the filename
+    csv_path = os.path.join(input_dir, csv_file)
+    df = pd.read_csv(csv_path, chunksize=10000)
+    
+    log_memory(f"After reading {csv_file}")
 
 # ============================================================================
 # SEARCH LAYOUT CONFIGURATION
@@ -284,6 +303,9 @@ print("\nSheet names that will be created:")
 for sheet_name in sheet_data.keys():
     print("-", sheet_name)
 
+log_memory("After combining all data")
+log_memory("Before writing XLSX")
+
 # ============================================================================
 # STEP 2: CREATE EXCEL WORKBOOK WITH ALL SHEETS
 # ============================================================================
@@ -423,6 +445,7 @@ else:
 # ============================================================================
 
 wb.save(output_file)
+log_memory("After writing XLSX")
 print(f"\n✅ Success! Excel file created: {output_file}")
 print("\nHow to use:")
 print("1. Open the Excel file and go to the 'Search_Tab' sheet")
