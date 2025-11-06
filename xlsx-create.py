@@ -319,8 +319,8 @@ with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
     # Create empty Search_Tab sheet (will be populated with formulas below)
     pd.DataFrame().to_excel(writer, index=False, sheet_name='Search_Tab')
 
-# Reload workbook to add formulas and formatting
-wb = openpyxl.load_workbook(output_file)
+# Access the workbook directly from the writer (NO reload needed!)
+wb = writer.book
 ws = wb['Search_Tab']
 
 # Move Search_Tab to be the first sheet in the workbook
